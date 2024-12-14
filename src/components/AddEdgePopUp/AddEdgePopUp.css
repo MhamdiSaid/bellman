@@ -1,0 +1,16 @@
+.add-edge{
+    width:20rem;
+    height:10rem;
+    background-color: rgb(186, 213, 236);
+    border-radius: 1rem;
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+}
+.add-edge>div{
+    display: flex;
+
+}
+.add-edge>div{
+    height:1.7rem;
+}

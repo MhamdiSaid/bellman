@@ -1,0 +1,16 @@
+.node{
+
+    border-radius:50%;
+    
+    color:white;
+    background-color: black;
+    display: flex;
+    align-items: center;
+}
+.node p{
+    margin:0rem;
+}
+.graph-2d{
+        width:100%;
+        height:100%
+}
