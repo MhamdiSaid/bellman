@@ -4,16 +4,22 @@ import viteLogo from '/vite.svg'
 import  Graph from "./components/Graph";
 import ToolBar from "./components/Toolbar/Toolbar";
 import AddEdgePopUp from "./components/AddEdgePopUp/AddEdgePopUp";
-import './App.css'
+import './App.css';
+import BellmanFordGraph from './components/visualize/visualize';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [vertices,setVertices]=useState(new Set());
+  const [edges,SetEdges]=useState();// here ghykoun array wla object
+  let source=useState(null);//source
 
   return (
     <>
       <Graph/>
       <ToolBar/>
       <AddEdgePopUp/>
+      <div className="App" style={{"position":"relative"}}>
+      <BellmanFordGraph />
+    </div>
     </>
   )
 }
