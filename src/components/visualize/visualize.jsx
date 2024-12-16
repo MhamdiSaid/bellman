@@ -167,7 +167,7 @@ const BellmanFordGraph = () => {
           arrowHeadType: 'arrowclosed'
         }}
       >
-        <MiniMap />
+        {/* <MiniMap /> */}
         <Controls />
         <Background />
       </ReactFlow>

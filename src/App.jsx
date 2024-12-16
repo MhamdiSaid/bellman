@@ -14,12 +14,12 @@ function App() {
 
   return (
     <>
-      <Graph/>
-      <ToolBar/>
-      <AddEdgePopUp/>
-      <div className="App" style={{"position":"relative"}}>
+      {/* <Graph/> */}
+      {/* <ToolBar/> */}
+      {/* <AddEdgePopUp/> */}
+      
       <BellmanFordGraph />
-    </div>
+    
     </>
   )
 }
