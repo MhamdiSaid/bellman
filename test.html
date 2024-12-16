@@ -4,9 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Graph Visualization</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap"
       rel="stylesheet"
@@ -15,7 +13,6 @@
       body {
         font-family: "Poppins", sans-serif;
       }
-      /* Glassmorphism style */
       .glass {
         background: rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(10px);
@@ -26,7 +23,6 @@
   </head>
   <body class="bg-gray-950 text-white">
     <div class="min-h-screen flex flex-col items-center px-6 py-10">
-      <!-- Header -->
       <header class="text-center mb-10">
         <h1
           class="text-6xl font-bold bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent"
@@ -38,11 +34,9 @@
         </p>
       </header>
 
-      <!-- Control Panel -->
       <div
         class="glass flex flex-wrap justify-center items-center gap-4 mb-10 p-6 rounded-2xl shadow-lg"
       >
-        <!-- Modern Input -->
         <div class="relative">
           <input
             type="text"
@@ -52,7 +46,6 @@
           />
         </div>
 
-        <!-- Add Node Button -->
         <button
           id="add-node"
           class="px-6 py-3 bg-gradient-to-r from-green-400 to-green-600 text-white font-semibold rounded-full shadow-lg hover:scale-105 transform transition duration-300"
@@ -74,7 +67,6 @@
           Run Bellman-Ford
         </button>
 
-        <!-- Source Node Selector -->
         <select
           id="source-node"
           class="px-6 py-3 glass text-white rounded-full focus:ring-2 focus:ring-indigo-400 transition duration-300"
@@ -83,14 +75,16 @@
         </select>
       </div>
 
-      <!-- Graph Container -->
       <div
         id="graph-container"
         class="relative w-full max-w-7xl h-[700px] glass rounded-2xl shadow-2xl border border-gray-700 overflow-hidden"
       ></div>
     </div>
 
-    <!-- JavaScript
+   
+  </body>
+</html>
+ <!-- JavaScript
     <script>
       const addNodeButton = document.getElementById("add-node");
       const nodeInput = document.getElementById("node-input");
@@ -111,5 +105,3 @@
         }
       });
     </script> -->
-  </body>
-</html>
