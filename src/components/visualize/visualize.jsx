@@ -7,10 +7,16 @@ import ReactFlow, {
   Controls,
   MiniMap,
   MarkerType,
+  Handle,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import "./visualize.css";
 
+
+//create custom nodes with circular shapes and with horizontal handles
+const circularNodeStyles = { width: '50px', height: '50px', borderRadius: '50%', border: '1px solid #777', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#fff', };
+const CustomNode = ({ data }) => ( <div style={circularNodeStyles}> <Handle type="target" position="left" id="a" style={{ background: '#555' }} /> <div>{data.label}</div> <Handle type="source" position="right" id="b" style={{ background: '#555' }} /> </div> );
+const nodeTypes = { customNode: CustomNode };
 // Helper function to create an adjacency list from nodes and edges
 const createAdjacencyList = (nodes, edges) => {
   const graph = {};
@@ -29,7 +35,9 @@ const BellmanFordGraph = () => {
   const [selectedSource, setSelectedSource] = useState("");
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
+  const [shortestP, setShortest] = useState({});  //name to be changed
 
+  //handling node and edge changes including positioning and deletion
   const onNodesChange = (changes) => {
     setNodes((nds) => applyNodeChanges(changes, nds));
   };
@@ -38,6 +46,16 @@ const BellmanFordGraph = () => {
     setEdges((eds) => applyEdgeChanges(changes, eds));
   };
 
+  //double click on edge to change the value of its weight
+  const HandleDoubleClickEdge = (event,edge) => {
+    event.preventDefault();
+    const weight = prompt("Enter weight for this edge:", "1");
+    const updatedEdge = {...edge, data: {weight: parseInt(weight, 10)}, label: `Weight: ${weight}`};
+    const updatedEdges = edges.map((edge) => edge.id === updatedEdge.id ? updatedEdge : edge);
+    setEdges(updatedEdges);
+  }
+
+  //onConnect for creating edges when connecting two nodes
   const onConnect = (params) => {
     const weight = prompt("Enter weight for this edge:", "1"); // Prompt user for edge weight
     const newEdge = {
@@ -45,12 +63,14 @@ const BellmanFordGraph = () => {
       data: { weight: parseInt(weight, 10) },
       label: `Weight: ${weight}`,
       type: "straight", // Use 'straight' edge to avoid curved preview
+      style: {zIndex: 20},
       // style: { strokeWidth: 2 },
       markerEnd: { type: MarkerType.ArrowClosed },
       // markerEnd: 'url(#arrowhead)', // Optional: Adjust edge thickness
     };
     setEdges((eds) => addEdge(newEdge, eds));
   };
+
   const handleRunBellmanFord = () => {
     if (!selectedSource) {
       alert("Please select a source node.");
@@ -62,6 +82,9 @@ const BellmanFordGraph = () => {
 
     const distance = {};
     const vertices = new Set();
+    //for shortest paths
+    const shortestPathsString = {}  // confusing names to change later
+    const shortest = {} //same
 
     // Initialize distances
     nodes.forEach((node) => {
@@ -79,9 +102,22 @@ const BellmanFordGraph = () => {
           distance[source] + data.weight < distance[target]
         ) {
           distance[target] = distance[source] + data.weight;
+          shortestPathsString[target] = source;  //to use it in finding the shortest paths
         }
       });
-    }
+}
+    //track the shortest paths for each target
+    shortest[selectedSource] = [selectedSource];
+    Object.keys(shortestPathsString).forEach((verticeId) => {
+      shortest[verticeId] = [verticeId]
+      shortest[verticeId] = [shortestPathsString[verticeId],...shortest[verticeId]];
+      while (!shortest[verticeId].find((nodeItem) => nodeItem === selectedSource)){
+        let verticeIdPrec = shortest[verticeId][0];
+        shortest[verticeId] = [shortestPathsString[verticeIdPrec],...shortest[verticeId]]
+      }
+  // console.log(shortest[verticeId]);
+});
+    setShortest(shortest);
 
     // Check for negative-weight cycles
     for (const edge of edges) {
@@ -95,13 +131,18 @@ const BellmanFordGraph = () => {
         return;
       }
     }
+    // console.log("Shortest distances from source:", distance);
 
-    console.log("Shortest distances from source:", distance);
-    const distancesWithLabels = {};
-    nodes.forEach((node) => {
-      distancesWithLabels[node.data.label] = distance[node.id];
-    });
-    setShortestPaths(distancesWithLabels);
+    //no need for this since we changed the id to be same as label
+    // const distancesWithLabels = {};
+    // nodes.forEach((node) => {
+    //   distancesWithLabels[node.data.label] = distance[node.id];
+    // });
+    // setShortestPaths(distancesWithLabels);
+
+    setShortestPaths(distance);
+
+
   };
 
   const addNewNode = () => {
@@ -110,12 +151,18 @@ const BellmanFordGraph = () => {
       return; // Prevent adding a node with an empty name
     }
 
-    const newNodeId = (nodes.length + 1).toString();
+    if (nodes.find((node) => node.data.label === nodeName)){ //checking if the node label is unique just for clarity reasons mainly in results table
+      alert(`${nodeName} already exists`);
+      return;
+    }
+    const newNodeId = nodeName;
+    //const newNodeId = (nodes.length !== 0) ? (parseInt(nodes[nodes.length - 1].id) + 1 ).toString() : "1"; //old verification to avoid a problem in deleting nodes but we do not need it anymore
     const newNode = {
+      type: 'customNode',
       id: newNodeId,
-      position: { x: Math.random() * 400, y: Math.random() * 400 },
+      position: { x: Math.random() * 300, y: Math.random() * 300, },  //changed from 400 to 300,but 200 is the perfect one i think
       data: { label: nodeName }, // Use the nodeName entered
-      style: { width: "50px", height: "50px", borderRadius: "50%" }, // Circular nodes
+      // style: { width: "50px", height: "50px", borderRadius: "50%", }, // Circular nodes
     };
 
     setNodes((nds) => [...nds, newNode]);
@@ -205,6 +252,7 @@ const BellmanFordGraph = () => {
         <ReactFlow
           nodes={nodes}
           edges={edges}
+          nodeTypes={nodeTypes}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
@@ -215,6 +263,7 @@ const BellmanFordGraph = () => {
             // animated: true, // Optional: Add animation for edge creation
             arrowHeadType: "arrowclosed",
           }}
+          onEdgeDoubleClick={HandleDoubleClickEdge}
         >
           <MiniMap />
           <Controls />
@@ -236,6 +285,9 @@ const BellmanFordGraph = () => {
                   <th className="px-6 py-3 text-lg font-semibold text-left border-b border-gray-700">
                     Distance
                   </th>
+                  <th className="px-6 py-3 text-lg font-semibold text-left border-b border-gray-700">
+                    Shortest Path
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -255,6 +307,15 @@ const BellmanFordGraph = () => {
                           <span className="text-green-400 font-semibold">
                             {distance}
                           </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-lg">
+                        {distance === Infinity ? (
+                          <span className="text-red-500 font-semibold">_</span>
+                        ): (
+                        <span className="text-green-400 font-semibold">
+                          {shortestP[node].join(', ')}
+                        </span>
                         )}
                       </td>
                     </tr>
