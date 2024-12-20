@@ -11,11 +11,37 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import "./visualize.css";
-
+import Header from "../Header";
 
 //create custom nodes with circular shapes and with horizontal handles
-const circularNodeStyles = { width: '50px', height: '50px', borderRadius: '50%', border: '1px solid #777', display: 'flex', justifyContent: 'center', alignItems: 'center', background: '#fff', };
-const CustomNode = ({ data }) => ( <div style={circularNodeStyles}> <Handle type="target" position="left" id="a" style={{ background: '#555' }} /> <div>{data.label}</div> <Handle type="source" position="right" id="b" style={{ background: '#555' }} /> </div> );
+const circularNodeStyles = {
+  width: "50px",
+  height: "50px",
+  borderRadius: "50%",
+  border: "1px solid #777",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  background: "#fff",
+};
+const CustomNode = ({ data }) => (
+  <div style={circularNodeStyles}>
+    {" "}
+    <Handle
+      type="target"
+      position="left"
+      id="a"
+      style={{ background: "#555" }}
+    />{" "}
+    <div>{data.label}</div>{" "}
+    <Handle
+      type="source"
+      position="right"
+      id="b"
+      style={{ background: "#555" }}
+    />{" "}
+  </div>
+);
 const nodeTypes = { customNode: CustomNode };
 // Helper function to create an adjacency list from nodes and edges
 const createAdjacencyList = (nodes, edges) => {
@@ -35,7 +61,7 @@ const BellmanFordGraph = () => {
   const [selectedSource, setSelectedSource] = useState("");
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
-  const [shortestP, setShortest] = useState({});  //name to be changed
+  const [shortestP, setShortest] = useState({}); //name to be changed
 
   //handling node and edge changes including positioning and deletion
   const onNodesChange = (changes) => {
@@ -47,13 +73,19 @@ const BellmanFordGraph = () => {
   };
 
   //double click on edge to change the value of its weight
-  const HandleDoubleClickEdge = (event,edge) => {
+  const HandleDoubleClickEdge = (event, edge) => {
     event.preventDefault();
     const weight = prompt("Enter weight for this edge:", "1");
-    const updatedEdge = {...edge, data: {weight: parseInt(weight, 10)}, label: `Weight: ${weight}`};
-    const updatedEdges = edges.map((edge) => edge.id === updatedEdge.id ? updatedEdge : edge);
+    const updatedEdge = {
+      ...edge,
+      data: { weight: parseInt(weight, 10) },
+      label: `Weight: ${weight}`,
+    };
+    const updatedEdges = edges.map((edge) =>
+      edge.id === updatedEdge.id ? updatedEdge : edge
+    );
     setEdges(updatedEdges);
-  }
+  };
 
   //onConnect for creating edges when connecting two nodes
   const onConnect = (params) => {
@@ -63,7 +95,7 @@ const BellmanFordGraph = () => {
       data: { weight: parseInt(weight, 10) },
       label: `Weight: ${weight}`,
       type: "straight", // Use 'straight' edge to avoid curved preview
-      style: {zIndex: 20},
+      style: { zIndex: 20 },
       // style: { strokeWidth: 2 },
       markerEnd: { type: MarkerType.ArrowClosed },
       // markerEnd: 'url(#arrowhead)', // Optional: Adjust edge thickness
@@ -83,8 +115,8 @@ const BellmanFordGraph = () => {
     const distance = {};
     const vertices = new Set();
     //for shortest paths
-    const shortestPathsString = {}  // confusing names to change later
-    const shortest = {} //same
+    const shortestPathsString = {}; // confusing names to change later
+    const shortest = {}; //same
 
     // Initialize distances
     nodes.forEach((node) => {
@@ -102,21 +134,29 @@ const BellmanFordGraph = () => {
           distance[source] + data.weight < distance[target]
         ) {
           distance[target] = distance[source] + data.weight;
-          shortestPathsString[target] = source;  //to use it in finding the shortest paths
+          shortestPathsString[target] = source; //to use it in finding the shortest paths
         }
       });
-}
+    }
     //track the shortest paths for each target
     shortest[selectedSource] = [selectedSource];
     Object.keys(shortestPathsString).forEach((verticeId) => {
-      shortest[verticeId] = [verticeId]
-      shortest[verticeId] = [shortestPathsString[verticeId],...shortest[verticeId]];
-      while (!shortest[verticeId].find((nodeItem) => nodeItem === selectedSource)){
+      shortest[verticeId] = [verticeId];
+      shortest[verticeId] = [
+        shortestPathsString[verticeId],
+        ...shortest[verticeId],
+      ];
+      while (
+        !shortest[verticeId].find((nodeItem) => nodeItem === selectedSource)
+      ) {
         let verticeIdPrec = shortest[verticeId][0];
-        shortest[verticeId] = [shortestPathsString[verticeIdPrec],...shortest[verticeId]]
+        shortest[verticeId] = [
+          shortestPathsString[verticeIdPrec],
+          ...shortest[verticeId],
+        ];
       }
-  // console.log(shortest[verticeId]);
-});
+      // console.log(shortest[verticeId]);
+    });
     setShortest(shortest);
 
     // Check for negative-weight cycles
@@ -141,8 +181,6 @@ const BellmanFordGraph = () => {
     // setShortestPaths(distancesWithLabels);
 
     setShortestPaths(distance);
-
-
   };
 
   const addNewNode = () => {
@@ -151,16 +189,17 @@ const BellmanFordGraph = () => {
       return; // Prevent adding a node with an empty name
     }
 
-    if (nodes.find((node) => node.data.label === nodeName)){ //checking if the node label is unique just for clarity reasons mainly in results table
+    if (nodes.find((node) => node.data.label === nodeName)) {
+      //checking if the node label is unique just for clarity reasons mainly in results table
       alert(`${nodeName} already exists`);
       return;
     }
     const newNodeId = nodeName;
     //const newNodeId = (nodes.length !== 0) ? (parseInt(nodes[nodes.length - 1].id) + 1 ).toString() : "1"; //old verification to avoid a problem in deleting nodes but we do not need it anymore
     const newNode = {
-      type: 'customNode',
+      type: "customNode",
       id: newNodeId,
-      position: { x: Math.random() * 300, y: Math.random() * 300, },  //changed from 400 to 300,but 200 is the perfect one i think
+      position: { x: Math.random() * 300, y: Math.random() * 300 }, //changed from 400 to 300,but 200 is the perfect one i think
       data: { label: nodeName }, // Use the nodeName entered
       // style: { width: "50px", height: "50px", borderRadius: "50%", }, // Circular nodes
     };
@@ -176,14 +215,7 @@ const BellmanFordGraph = () => {
 
   return (
     <div className="body min-h-screen flex flex-col items-center px-6 py-10">
-      <header className="text-center mb-10">
-        <h1 className="text-6xl font-bold bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-          Graphe-Bellman
-        </h1>
-        <p className="text-gray-400 text-lg mt-2">
-          Visualize graphs and find shortest paths effortlessly
-        </p>
-      </header>
+      <Header />
 
       <div className="bg-gray-900 flex flex-wrap justify-center items-center gap-4 mb-10 p-6 rounded-2xl shadow-lg">
         <div className="relative">
@@ -312,10 +344,10 @@ const BellmanFordGraph = () => {
                       <td className="px-6 py-4 text-lg">
                         {distance === Infinity ? (
                           <span className="text-red-500 font-semibold">_</span>
-                        ): (
-                        <span className="text-green-400 font-semibold">
-                          {shortestP[node].join(', ')}
-                        </span>
+                        ) : (
+                          <span className="text-green-400 font-semibold">
+                            {shortestP[node].join(", ")}
+                          </span>
                         )}
                       </td>
                     </tr>
