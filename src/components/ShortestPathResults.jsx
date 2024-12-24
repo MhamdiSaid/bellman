@@ -1,6 +1,6 @@
 import React from "react";
 
-const ShortestPathResults = ({ shortestPaths, shortestP }) => (
+const ShortestPathResults = ({ shortestDistances, shortestPaths }) => (
   <div className="mt-10 w-full max-w-2xl mx-auto p-4 bg-gray-900 rounded-2xl shadow-2xl border border-gray-700">
     <h2 className="text-2xl font-bold text-white mb-6 text-center bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
       Shortest Path Results
@@ -21,7 +21,7 @@ const ShortestPathResults = ({ shortestPaths, shortestP }) => (
           </tr>
         </thead>
         <tbody>
-          {Object.entries(shortestPaths).map(([node, distance], index) => (
+          {Object.entries(shortestDistances).map(([node, distance], index) => (
             <tr
               key={node}
               className={`${
@@ -43,7 +43,7 @@ const ShortestPathResults = ({ shortestPaths, shortestP }) => (
                   <span className="text-red-500 font-semibold">_</span>
                 ) : (
                   <span className="text-green-400 font-semibold">
-                    {shortestP[node].join(", ")}
+                    {shortestPaths[node].join(", ")}
                   </span>
                 )}
               </td>

@@ -15,11 +15,11 @@ import BellmanAlgo from "./BellmanFordAlgo/BellmanAlgo";
 
 const BellmanFordGraph = () => {
   const [nodeName, setNodeName] = useState("");
-  const [shortestPaths, setShortestPaths] = useState(null);
+  const [shortestDistances, setShortestDistances] = useState(null);
   const [selectedSource, setSelectedSource] = useState("");
   const [nodes, setNodes] = useState([]);
   const [edges, setEdges] = useState([]);
-  const [shortestP, setShortest] = useState({}); //name to be changed
+  const [shortestPaths, setShortestPaths] = useState({}); //name to be changed
 
   //handling node and edge changes including positioning and deletion
   const onNodesChange = (changes) => {
@@ -53,10 +53,7 @@ const BellmanFordGraph = () => {
       data: { weight: parseInt(weight, 10) },
       label: `Weight: ${weight}`,
       type: "straight", // Use 'straight' edge to avoid curved preview
-      style: { zIndex: 20 },
-      // style: { strokeWidth: 2 },
       markerEnd: { type: MarkerType.ArrowClosed },
-      // markerEnd: 'url(#arrowhead)', // Optional: Adjust edge thickness
     };
     setEdges((eds) => addEdge(newEdge, eds));
   };
@@ -67,10 +64,10 @@ const BellmanFordGraph = () => {
       return;
     }
 
-    const [distance, shortest] = BellmanAlgo(nodes, edges, selectedSource);
+    const [distances, shortestPaths] = BellmanAlgo(nodes, edges, selectedSource);
 
-    setShortest(shortest);
-    setShortestPaths(distance);
+    setShortestPaths(shortestPaths);
+    setShortestDistances(distances);
   };
 
   const addNewNode = () => {
@@ -85,13 +82,11 @@ const BellmanFordGraph = () => {
       return;
     }
     const newNodeId = nodeName;
-    //const newNodeId = (nodes.length !== 0) ? (parseInt(nodes[nodes.length - 1].id) + 1 ).toString() : "1"; //old verification to avoid a problem in deleting nodes but we do not need it anymore
     const newNode = {
       type: "customNode",
       id: newNodeId,
-      position: { x: Math.random() * 300, y: Math.random() * 300 }, //changed from 400 to 300,but 200 is the perfect one i think
+      position: { x: Math.random() * 200, y: Math.random() * 200 },
       data: { label: nodeName }, // Use the nodeName entered
-      // style: { width: "50px", height: "50px", borderRadius: "50%", }, // Circular nodes
     };
 
     setNodes((nds) => [...nds, newNode]);
@@ -125,10 +120,10 @@ const BellmanFordGraph = () => {
         onConnect={onConnect}
         HandleDoubleClickEdge={HandleDoubleClickEdge}
       />
-      {shortestPaths && (
+      {shortestDistances && (
         <ShortestPathResults
+          shortestDistances={shortestDistances}
           shortestPaths={shortestPaths}
-          shortestP={shortestP}
         />
       )}
     </div>

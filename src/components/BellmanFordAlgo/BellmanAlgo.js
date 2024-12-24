@@ -17,8 +17,8 @@ const BellmanAlgo = (nodes, edges, selectedSource) => {
   const distance = {};
   const vertices = new Set();
   //for shortest paths
-  const shortestPathsString = {}; // confusing names to change later
-  const shortest = {}; //same
+  const targetLastEdgeSource = {};
+  const shortestPaths = {}; 
 
   // Initialize distances
   nodes.forEach((node) => {
@@ -36,29 +36,10 @@ const BellmanAlgo = (nodes, edges, selectedSource) => {
         distance[source] + data.weight < distance[target]
       ) {
         distance[target] = distance[source] + data.weight;
-        shortestPathsString[target] = source; //to use it in finding the shortest paths
+        targetLastEdgeSource[target] = source; //to use it in finding the shortest paths
       }
     });
   }
-  //track the shortest paths for each target
-  shortest[selectedSource] = [selectedSource];
-  Object.keys(shortestPathsString).forEach((verticeId) => {
-    shortest[verticeId] = [verticeId];
-    shortest[verticeId] = [
-      shortestPathsString[verticeId],
-      ...shortest[verticeId],
-    ];
-    while (
-      !shortest[verticeId].find((nodeItem) => nodeItem === selectedSource)
-    ) {
-      let verticeIdPrec = shortest[verticeId][0];
-      shortest[verticeId] = [
-        shortestPathsString[verticeIdPrec],
-        ...shortest[verticeId],
-      ];
-    }
-    // console.log(shortest[verticeId]);
-  });
 
   // Check for negative-weight cycles
   for (const edge of edges) {
@@ -72,14 +53,26 @@ const BellmanAlgo = (nodes, edges, selectedSource) => {
       return;
     }
   }
-  // console.log("Shortest distances from source:", distance);
 
-  //no need for this since we changed the id to be same as label
-  // const distancesWithLabels = {};
-  // nodes.forEach((node) => {
-  //   distancesWithLabels[node.data.label] = distance[node.id];
-  // });
-  // setShortestPaths(distancesWithLabels);
-  return [distance, shortest];
+  //track the shortest paths for each target
+  shortestPaths[selectedSource] = [selectedSource];
+  Object.keys(targetLastEdgeSource).forEach((verticeId) => {
+    shortestPaths[verticeId] = [verticeId];
+    shortestPaths[verticeId] = [
+      targetLastEdgeSource[verticeId],
+      ...shortestPaths[verticeId],
+    ];
+    while (
+      !shortestPaths[verticeId].find((nodeItem) => nodeItem === selectedSource)
+    ) {
+      let verticeIdPrec = shortestPaths[verticeId][0];
+      shortestPaths[verticeId] = [
+        targetLastEdgeSource[verticeIdPrec],
+        ...shortestPaths[verticeId],
+      ];
+    }
+  });
+
+  return [distance, shortestPaths];
 };
 export default BellmanAlgo;
