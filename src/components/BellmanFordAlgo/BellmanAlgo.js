@@ -1,19 +1,4 @@
 const BellmanAlgo = (nodes, edges, selectedSource) => {
-  // Helper function to create an adjacency list from nodes and edges
-  const createAdjacencyList = (nodes, edges) => {
-    const graph = {};
-    nodes.forEach((node) => {
-      graph[node.id] = [];
-    });
-    edges.forEach((edge) => {
-      graph[edge.source].push({ target: edge.target, weight: edge.data.weight });
-    });
-    return graph;
-  };
-
-  const graph = createAdjacencyList(nodes, edges);
-  console.log("Adjacency List:", graph);
-
   const distance = {};
   const vertices = new Set();
   //for shortest paths
